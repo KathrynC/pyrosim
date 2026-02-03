@@ -1,4 +1,5 @@
 from pyrosim.neuron  import NEURON
+import math
 
 from pyrosim.synapse import SYNAPSE
 
@@ -31,10 +32,25 @@ class NEURAL_NETWORK:
 # ---------------- Private methods --------------------------------------
 
     def Update(self):
+        # 1) Update sensor neurons from touch sensors
         for neuronName in self.neurons:
             if self.neurons[neuronName].Is_Sensor_Neuron():
                 self.neurons[neuronName].Update_Sensor_Neuron()
 
+        # 2) Update all non-sensor neurons (motor + hidden) from incoming synapses
+        for targetName in self.neurons:
+            if not self.neurons[targetName].Is_Sensor_Neuron():
+                total = 0.0
+                for sourceName in self.neurons:
+                    key = (sourceName, targetName)
+                    if key in self.synapses:
+                        total += self.synapses[key].Get_Weight() * self.neurons[sourceName].Get_Value()
+                val = math.tanh(total)
+                # Some versions have Set_Value, some just store .value
+                try:
+                    self.neurons[targetName].Set_Value(val)
+                except AttributeError:
+                    self.neurons[targetName].value = val
     def Add_Neuron_According_To(self,line):
 
         neuron = NEURON(line)
