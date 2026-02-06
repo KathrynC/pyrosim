@@ -183,6 +183,28 @@ def Send_Synapse( sourceNeuronName , targetNeuronName , weight ):
  
 def Set_Motor_For_Joint(bodyIndex,jointName,controlMode,targetPosition,maxForce):
 
+    # Normalize jointName key type (PyBullet often reports joint names as bytes)
+
+    if jointName not in jointNamesToIndices:
+
+        if isinstance(jointName, str):
+
+            jb = jointName.encode('utf-8')
+
+            if jb in jointNamesToIndices:
+
+                jointName = jb
+
+        elif isinstance(jointName, (bytes, bytearray)):
+
+            js = bytes(jointName).decode('utf-8', 'replace')
+
+            if js in jointNamesToIndices:
+
+                jointName = js
+
+    
+
     p.setJointMotorControl2(
 
         bodyIndex      = bodyIndex,
