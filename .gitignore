@@ -4,3 +4,6 @@ __pycache__/
 
 # local backups
 *.bak*
+
+# local backups
+*.GOOD_*
